@@ -1,11 +1,8 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:food_app/scr/models/cart_item.dart';
 import 'package:food_app/scr/models/order.dart';
 
 class OrderServices {
   String collection = "orders";
-  // Firestore _firestore = Firestore.instance;
-
   void createOrder(
       {String userId,
       String id,
@@ -17,8 +14,8 @@ class OrderServices {
     List<String> restaurantIds = [];
 
     for (CartItemModel item in cart) {
-      convertedCart.add(item.toMap());
-      restaurantIds.add(item.restaurantId);
+      convertedCart.add(item.toJson());
+      restaurantIds.add(item.sRestaurantId);
     }
 
     // _firestore.collection(collection).document(id).setData({

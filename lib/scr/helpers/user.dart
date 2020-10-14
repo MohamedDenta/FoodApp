@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:food_app/scr/models/auth_response.dart';
 import 'package:food_app/scr/models/cart_item.dart';
+import 'package:food_app/scr/models/cart_response.dart';
 import 'package:food_app/scr/models/like_response.dart';
 import 'package:food_app/scr/models/user.dart';
 import 'package:food_app/scr/providers/user.dart';
@@ -101,20 +102,28 @@ class UserServices {
     // _firestore.collection(collection).document(id).updateData(values);
   }
 
-  void addToCart({String userId, CartItemModel cartItem}) {
+  Future<CartResponse> addToCart(
+      {String userId, CartItemModel cartItem}) async {
     print("THE USER ID IS: $userId");
-    print("cart items are: ${cartItem.toString()}");
-    // _firestore.collection(collection).document(userId).updateData({
-    //   "cart": FieldValue.arrayUnion([cartItem.toMap()])
-    // });
+    print("cart items are: ${cartItem.sImage}");
+    var url = Uri.encodeFull(App.API + "/add-to-cart");
+    var e = jsonEncode(cartItem.toJson());
+    print(e);
+    Response response = await http.post(url, body: e);
+    print(response.statusCode);
+    var res =
+        CartResponse.fromJson(jsonDecode(response.body), response.statusCode);
+    return res;
   }
 
-  void removeFromCart({String userId, CartItemModel cartItem}) {
-    print("THE USER ID IS: $userId");
-    print("cart items are: ${cartItem.toString()}");
-    // _firestore.collection(collection).document(userId).updateData({
-    //   "cart": FieldValue.arrayRemove([cartItem.toMap()])
-    // });
+  Future<CartResponse> removeFromCart({String uid, String id}) async {
+    var url = Uri.encodeFull(App.API + "/remove-from-cart");
+    var e = jsonEncode({"_id": id, "_uid": uid});
+    Response response = await http.post(url, body: e);
+    print(response.statusCode);
+    var res =
+        CartResponse.fromJson(jsonDecode(response.body), response.statusCode);
+    return res;
   }
 
   UserModel getUserById(String id) {
@@ -122,5 +131,15 @@ class UserServices {
     //   _firestore.collection(collection).document(id).get().then((doc) {
     //   return UserModel.fromSnapshot(doc);
     // });
+  }
+
+  Future<CartResponse> getCart(String id, String uid) async {
+    var url = Uri.encodeFull(App.API + "/get-cart");
+    var e = jsonEncode({"_id": id, "_uid": uid});
+    Response response = await http.post(url, body: e);
+    print(response.statusCode);
+    var res =
+        CartResponse.fromJson(jsonDecode(response.body), response.statusCode);
+    return res;
   }
 }

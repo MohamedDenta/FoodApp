@@ -30,16 +30,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   @override
-  void initState() {
-    // TODO: implement initState
-    // final categoryProvider = Provider.of<CategoryProvider>(context);
-    // categoryProvider.loadCategories();
-    // final productProvider = Provider.of<ProductProvider>(context);
-    // productProvider.loadProducts();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
     final app = Provider.of<AppProvider>(context);
@@ -53,9 +43,9 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: white),
         elevation: 0.5,
-        backgroundColor: primary,
+        backgroundColor: green,
         title: CustomText(
-          text: "food market",
+          text: "plants market",
           color: white,
         ),
         actions: <Widget>[
@@ -63,7 +53,9 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               IconButton(
                 icon: Icon(Icons.shopping_cart),
-                onPressed: () {
+                onPressed: () async {
+                  var prefs = await SharedPreferences.getInstance();
+                  await user.getCart(id: "id", uid: prefs.getString("id"));
                   changeScreen(context, CartScreen());
                 },
               ),
@@ -75,7 +67,7 @@ class _HomeState extends State<Home> {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: primary),
+              decoration: BoxDecoration(color: green),
               accountName: CustomText(
                 text: user.userModel?.name ?? "username lading...",
                 color: white,
@@ -103,15 +95,18 @@ class _HomeState extends State<Home> {
               title: CustomText(text: "My orders"),
             ),
             ListTile(
-              onTap: () {
+              onTap: () async {
+                var prefs = await SharedPreferences.getInstance();
+                user.getCart(id: "id", uid: prefs.getString("id"));
                 changeScreen(context, CartScreen());
               },
               leading: Icon(Icons.shopping_cart),
               title: CustomText(text: "Cart"),
             ),
             ListTile(
-              onTap: () {
-                user.signOut();
+              onTap: () async {
+                var prefs = await SharedPreferences.getInstance();
+                await prefs.setBool("login", false);
                 changeScreenReplacement(context, LoginScreen());
               },
               leading: Icon(Icons.exit_to_app),
@@ -133,7 +128,7 @@ class _HomeState extends State<Home> {
                 children: <Widget>[
                   Container(
                     decoration: BoxDecoration(
-                        color: primary,
+                        color: green,
                         borderRadius: BorderRadius.only(
                             bottomRight: Radius.circular(20),
                             bottomLeft: Radius.circular(20))),
@@ -148,7 +143,7 @@ class _HomeState extends State<Home> {
                         child: ListTile(
                           leading: Icon(
                             Icons.search,
-                            color: red,
+                            color: green,
                           ),
                           title: TextField(
                             textInputAction: TextInputAction.search,
@@ -166,7 +161,7 @@ class _HomeState extends State<Home> {
                               app.changeLoading();
                             },
                             decoration: InputDecoration(
-                              hintText: "Find food and restaurant",
+                              hintText: "Find plants and stores",
                               border: InputBorder.none,
                             ),
                           ),
@@ -195,11 +190,10 @@ class _HomeState extends State<Home> {
                           if (value == "Products") {
                             app.changeSearchBy(newSearchBy: SearchBy.PRODUCTS);
                           } else {
-                            app.changeSearchBy(
-                                newSearchBy: SearchBy.RESTAURANTS);
+                            app.changeSearchBy(newSearchBy: SearchBy.STORES);
                           }
                         },
-                        items: <String>["Products", "Restaurants"]
+                        items: <String>["Products", "Stores"]
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                               value: value, child: Text(value));
@@ -262,7 +256,7 @@ class _HomeState extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         CustomText(
-                          text: "Popular restaurants",
+                          text: "Popular stores",
                           size: 20,
                           color: grey,
                         ),

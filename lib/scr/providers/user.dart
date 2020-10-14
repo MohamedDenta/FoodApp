@@ -7,6 +7,7 @@ import 'package:food_app/scr/helpers/user.dart';
 import 'package:food_app/scr/helpers/user.dart';
 import 'package:food_app/scr/models/auth_response.dart';
 import 'package:food_app/scr/models/cart_item.dart';
+import 'package:food_app/scr/models/cart_response.dart';
 import 'package:food_app/scr/models/order.dart';
 import 'package:food_app/scr/models/products.dart';
 import 'package:food_app/scr/models/user.dart';
@@ -152,36 +153,33 @@ class UserProvider with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  bool addToCard({ProductModel product, int quantity}) {
+  Future<String> addToCard(
+      {ProductModel product, int quantity, String userId}) async {
     print("THE PRODUC IS: ${product.toString()}");
     print("THE qty IS: ${quantity.toString()}");
 
     try {
-      var uuid = Uuid();
-      String cartItemId = uuid.v4();
-      List cart = _userModel.cart;
-//      bool itemExists = false;
-      Map cartItem = {
-        "id": cartItemId,
-        "name": product.sName,
-        "image": product.sImage,
-        "restaurantId": product.sRestaurantId,
-        "totalRestaurantSale": product.iPrice * quantity,
-        "productId": product.sId,
-        "price": product.iPrice,
-        "quantity": quantity
+      //List cart = _userModel.cart;
+      Map<String, dynamic> cartItem = {
+        "_id": product.sId,
+        "_uid": userId,
+        "_name": product.sName,
+        "_image": product.sImage,
+        "_restaurant_id": product.sRestaurantId,
+        "_total_restaurant_sale": product.iPrice * quantity,
+        // "productId": product.sId,
+        "_price": product.iPrice,
+        "_quantity": quantity
       };
-
-      CartItemModel item = CartItemModel.fromMap(cartItem);
-//      if(!itemExists){
-      print("CART ITEMS ARE: ${cart.toString()}");
-      // _userServicse.addToCart(userId: _user.uid, cartItem: item);
-//      }
-
-      return true;
+      CartItemModel item = CartItemModel.fromJson(cartItem);
+      var res = await _userServicse.addToCart(cartItem: item);
+      if (res.code == 200) {
+        return "";
+      }
+      return res.message;
     } catch (e) {
       print("THE ERROR ${e.toString()}");
-      return false;
+      return e.toString();
     }
   }
 
@@ -190,15 +188,37 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool removeFromCart({CartItemModel cartItem}) {
-    print("THE PRODUC IS: ${cartItem.toString()}");
-
+  Future<bool> removeFromCart({String id, String uid}) async {
     try {
-      // _userServicse.removeFromCart(userId: _user.uid, cartItem: cartItem);
-      return true;
+      var res = await _userServicse.removeFromCart(uid: uid, id: id);
+      if (res.code == 200) {
+        res = await getCart(id: id, uid: uid);
+      }
+      return res.code == 200;
     } catch (e) {
       print("THE ERROR ${e.toString()}");
       return false;
     }
+  }
+
+  Future<CartResponse> getCart({String id, String uid}) async {
+    try {
+      var r = await _userServicse.getCart(id, uid);
+      _userModel.cart = r.data;
+      _userModel.totalCartPrice = calculatePrice(_userModel.cart);
+      notifyListeners();
+      return r;
+    } catch (e) {
+      print("THE ERROR ${e.toString()}");
+      return CartResponse();
+    }
+  }
+
+  int calculatePrice(List<CartItemModel> cart) {
+    int r = 0;
+    for (var i = 0; i < cart.length; i++) {
+      r += cart[i].iPrice;
+    }
+    return r;
   }
 }

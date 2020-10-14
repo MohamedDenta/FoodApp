@@ -18,7 +18,7 @@ class LikeWidget extends StatelessWidget {
           padding: const EdgeInsets.all(4.0),
           child: Icon(
             Icons.favorite_border,
-            color: red,
+            color: green,
             size: 18,
           ),
         ),

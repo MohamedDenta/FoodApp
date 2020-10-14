@@ -111,7 +111,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                 widget.product.bLiked
                                     ? Icons.favorite
                                     : Icons.favorite_border,
-                                color: red,
+                                color: green,
                                 size: 18,
                               ),
                               onPressed: () async {

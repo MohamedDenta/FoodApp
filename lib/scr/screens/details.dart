@@ -8,6 +8,7 @@ import 'package:food_app/scr/screens/cart.dart';
 import 'package:food_app/scr/widgets/custom_text.dart';
 import 'package:food_app/scr/widgets/loading.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/style.dart';
 
 class Details extends StatefulWidget {
@@ -37,7 +38,9 @@ class _DetailsState extends State<Details> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.shopping_cart),
-            onPressed: () {
+            onPressed: () async {
+              var prefs = await SharedPreferences.getInstance();
+              user.getCart(id: "id", uid: prefs.getString("id"));
               changeScreen(context, CartScreen());
             },
           ),
@@ -111,18 +114,27 @@ class _DetailsState extends State<Details> {
                         onTap: () async {
                           app.changeLoading();
                           print("All set loading");
+                          var prefs = await SharedPreferences.getInstance();
 
-                          bool value = await user.addToCard(
-                              product: widget.product, quantity: quantity);
-                          if (value) {
+                          var value = await user.addToCard(
+                              product: widget.product,
+                              quantity: quantity,
+                              userId: prefs.getString("id"));
+                          if (value == "") {
                             print("Item added to cart");
                             _key.currentState.showSnackBar(
-                                SnackBar(content: Text("Added ro Cart!")));
-                            user.reloadUserModel();
+                                SnackBar(content: Text("Added to Cart!")));
+                            // user.reloadUserModel();
                             app.changeLoading();
+                            Navigator.of(context).pop(true);
                             return;
                           } else {
                             print("Item NOT added to cart");
+                            print("Item not added to cart");
+                            _key.currentState
+                                .showSnackBar(SnackBar(content: Text(value)));
+                            user.reloadUserModel();
+                            app.changeLoading();
                           }
                           print("lOADING SET TO FALSE");
                         },
@@ -150,7 +162,7 @@ class _DetailsState extends State<Details> {
                             icon: Icon(
                               Icons.add,
                               size: 36,
-                              color: red,
+                              color: green,
                             ),
                             onPressed: () {
                               setState(() {

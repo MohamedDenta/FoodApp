@@ -60,6 +60,7 @@ class UserModel {
     email = json['_email'];
     password = json['_password'];
     stripeId = json['_strip_id'];
+    totalCartPrice = json['_total_cart_price'];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -68,6 +69,7 @@ class UserModel {
     data['_email'] = this.email;
     data['_password'] = this.password;
     data['_strip_id'] = this.stripeId;
+    data['_total_cart_price'] = totalCartPrice;
     return data;
   }
 
@@ -93,7 +95,7 @@ class UserModel {
   List<CartItemModel> _convertCartItems(List cart) {
     List<CartItemModel> convertedCart = [];
     for (Map cartItem in cart) {
-      convertedCart.add(CartItemModel.fromMap(cartItem));
+      convertedCart.add(CartItemModel.fromJson(cartItem));
     }
     return convertedCart;
   }

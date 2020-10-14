@@ -39,6 +39,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 children: <Widget>[
                   SizedBox(
                     height: 100,
+                    child: Center(
+                        child: Padding(
+                      padding: const EdgeInsets.only(top: 70.0),
+                      child: Text(
+                        "plants market",
+                        style: TextStyle(
+                            fontSize: 20, fontStyle: FontStyle.italic),
+                      ),
+                    )),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -47,6 +56,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         "images/logo.png",
                         width: 100,
                         height: 100,
+                        color: green,
                       ),
                     ],
                   ),
@@ -67,7 +77,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "Username",
-                            icon: Icon(Icons.person),
+                            icon: Icon(
+                              Icons.person,
+                              color: green,
+                            ),
                           ),
                         ),
                       ),
@@ -88,7 +101,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: "Email",
-                              icon: Icon(Icons.email)),
+                              icon: Icon(
+                                Icons.email,
+                                color: green,
+                              )),
                         ),
                       ),
                     ),
@@ -108,7 +124,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: "Password",
-                              icon: Icon(Icons.lock)),
+                              icon: Icon(
+                                Icons.lock,
+                                color: green,
+                              )),
                         ),
                       ),
                     ),
@@ -142,7 +161,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                            color: red,
+                            color: green,
                             border: Border.all(color: grey),
                             borderRadius: BorderRadius.circular(15)),
                         child: Padding(

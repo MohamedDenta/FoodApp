@@ -38,6 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: <Widget>[
                   SizedBox(
                     height: 100,
+                    child: Center(
+                        child: Padding(
+                      padding: const EdgeInsets.only(top: 70.0),
+                      child: Text(
+                        "plants market",
+                        style: TextStyle(
+                            fontSize: 20, fontStyle: FontStyle.italic),
+                      ),
+                    )),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -46,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         "images/logo.png",
                         width: 120,
                         height: 120,
+                        color: Colors.green,
                       ),
                     ],
                   ),
@@ -67,7 +77,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: "Email",
-                              icon: Icon(Icons.email)),
+                              icon: Icon(
+                                Icons.email,
+                                color: green,
+                              )),
                         ),
                       ),
                     ),
@@ -87,7 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: "Password",
-                              icon: Icon(Icons.lock)),
+                              icon: Icon(
+                                Icons.lock,
+                                color: green,
+                              )),
                         ),
                       ),
                     ),
@@ -108,8 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             categoryProvider.loadCategories();
                             print("categoryProvider.response.message");
                             print(categoryProvider.response.message);
-                            //restaurantProvider.loadSingleRestaurant();
-                            //productProvider.loadProducts();
+                            restaurantProvider.loadPopularRestaurants();
+                            productProvider.loadAllProducts();
                             changeScreenReplacement(context, Home());
                           } else {
                             _key.currentState.showSnackBar(SnackBar(
@@ -126,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                            color: red,
+                            color: green,
                             border: Border.all(color: grey),
                             borderRadius: BorderRadius.circular(15)),
                         child: Padding(

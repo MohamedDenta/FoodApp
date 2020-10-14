@@ -7,7 +7,6 @@ import 'package:food_app/scr/providers/user.dart';
 import 'package:food_app/scr/screens/home.dart';
 import 'package:food_app/scr/screens/login.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

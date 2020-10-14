@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:food_app/scr/helpers/order.dart';
 import 'package:food_app/scr/helpers/style.dart';
@@ -7,6 +8,7 @@ import 'package:food_app/scr/providers/user.dart';
 import 'package:food_app/scr/widgets/custom_text.dart';
 import 'package:food_app/scr/widgets/loading.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class CartScreen extends StatefulWidget {
@@ -22,7 +24,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
     final app = Provider.of<AppProvider>(context);
-
+    print(user.userModel.totalCartPrice);
     return Scaffold(
       key: _key,
       appBar: AppBar(
@@ -40,7 +42,7 @@ class _CartScreenState extends State<CartScreen> {
       body: app.isLoading
           ? Loading()
           : ListView.builder(
-              itemCount: user.userModel.cart.length,
+              itemCount: user.userModel?.cart?.length,
               itemBuilder: (_, index) {
                 return Padding(
                   padding: const EdgeInsets.all(16),
@@ -51,7 +53,7 @@ class _CartScreenState extends State<CartScreen> {
                         color: white,
                         boxShadow: [
                           BoxShadow(
-                              color: red.withOpacity(0.2),
+                              color: green.withOpacity(0.2),
                               offset: Offset(3, 2),
                               blurRadius: 30)
                         ]),
@@ -62,10 +64,10 @@ class _CartScreenState extends State<CartScreen> {
                             bottomLeft: Radius.circular(20),
                             topLeft: Radius.circular(20),
                           ),
-                          child: Image.network(
-                            user.userModel.cart[index].image,
-                            height: 120,
-                            width: 140,
+                          child: CachedNetworkImage(
+                            imageUrl: user.userModel.cart[index].sImage,
+                            height: 100,
+                            width: 100,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -79,15 +81,15 @@ class _CartScreenState extends State<CartScreen> {
                               RichText(
                                 text: TextSpan(children: [
                                   TextSpan(
-                                      text: user.userModel.cart[index].name +
+                                      text: user.userModel.cart[index].sName +
                                           "\n",
                                       style: TextStyle(
                                           color: black,
-                                          fontSize: 20,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.bold)),
                                   TextSpan(
                                       text:
-                                          "\$${user.userModel.cart[index].price / 100} \n\n",
+                                          "\$${user.userModel.cart[index].iPrice / 100} \n\n",
                                       style: TextStyle(
                                           color: black,
                                           fontSize: 18,
@@ -99,7 +101,7 @@ class _CartScreenState extends State<CartScreen> {
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400)),
                                   TextSpan(
-                                      text: user.userModel.cart[index].quantity
+                                      text: user.userModel.cart[index].iQuantity
                                           .toString(),
                                       style: TextStyle(
                                           color: primary,
@@ -110,12 +112,15 @@ class _CartScreenState extends State<CartScreen> {
                               IconButton(
                                   icon: Icon(
                                     Icons.delete,
-                                    color: red,
+                                    color: green,
                                   ),
                                   onPressed: () async {
+                                    var prefs =
+                                        await SharedPreferences.getInstance();
                                     app.changeLoading();
                                     bool value = await user.removeFromCart(
-                                        cartItem: user.userModel.cart[index]);
+                                        id: user.userModel.cart[index].sId,
+                                        uid: prefs.getString("id"));
                                     if (value) {
                                       user.reloadUserModel();
                                       print("Item added to cart");
@@ -152,6 +157,8 @@ class _CartScreenState extends State<CartScreen> {
                           fontSize: 22,
                           fontWeight: FontWeight.w400)),
                   TextSpan(
+                      //user.userModel.totalCartPrice
+
                       text: " \$${user.userModel.totalCartPrice / 100}",
                       style: TextStyle(
                           color: primary,
@@ -224,10 +231,12 @@ class _CartScreenState extends State<CartScreen> {
                                         width: 320.0,
                                         child: RaisedButton(
                                           onPressed: () async {
+                                            var prefs = await SharedPreferences
+                                                .getInstance();
                                             var uuid = Uuid();
                                             String id = uuid.v4();
                                             _orderServices.createOrder(
-                                                userId: 'user.user.uid',
+                                                userId: prefs.getString("id"),
                                                 id: id,
                                                 description:
                                                     "Some random description",
@@ -239,7 +248,9 @@ class _CartScreenState extends State<CartScreen> {
                                                 in user.userModel.cart) {
                                               bool value =
                                                   await user.removeFromCart(
-                                                      cartItem: cartItem);
+                                                      id: cartItem.sId,
+                                                      uid: prefs
+                                                          .getString("id"));
                                               if (value) {
                                                 user.reloadUserModel();
                                                 print("Item added to cart");
@@ -276,7 +287,7 @@ class _CartScreenState extends State<CartScreen> {
                                               style: TextStyle(
                                                   color: Colors.white),
                                             ),
-                                            color: red),
+                                            color: green),
                                       )
                                     ],
                                   ),
